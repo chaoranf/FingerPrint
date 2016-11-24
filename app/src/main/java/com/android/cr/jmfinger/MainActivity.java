@@ -1,6 +1,5 @@
 package com.android.cr.jmfinger;
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -8,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -33,12 +31,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    // Example of a call to a native method
-    TextView tv = (TextView) findViewById(R.id.sample_text);
-    tv.setText(stringFromJNI()+phoneParamters());
-    TextView tv2 = (TextView) findViewById(R.id.sample_text1);
-    tv2.setText(Util.got().fetchInfo(this));
-        testAnotation();
+        // Example of a call to a native method
+        TextView tv = (TextView) findViewById(R.id.sample_text);
+        tv.setText(stringFromJNI() + phoneParamters());
+        TextView tv2 = (TextView) findViewById(R.id.sample_text1);
+        tv2.setText(Util.got().fetchInfo(this));
     }
 
     @Override
@@ -63,14 +60,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @TargetApi(22)
-    private void testAnotation(){
-        if(Build.VERSION.SDK_INT >=22 ){
-            throw new RuntimeException("go gog go");
-        }else{
-            Log.e("testff","gogogoogogogogogoogog");
-        }
-    }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
