@@ -18,11 +18,41 @@
         android:id="@+id/sample_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:text="This is jm finger demo!"/>
 
-    <TextView
-        android:id="@+id/sample_text1"
+
+    <Button
+        android:id="@+id/btn_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!222"/>
+        android:layout_above="@+id/btn_request"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="36dp"
+        android:layout_marginStart="117dp"
+        android:text="Login"/>
+
+    <Button
+        android:id="@+id/btn_request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="78dp"
+        android:text="BussinessRequest"/>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/sample_text"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="32dp"
+        android:background="#00bfff"
+        android:backgroundTintMode="add"
+        android:ems="10"
+        android:hapticFeedbackEnabled="true"
+        android:hint="请输入你的uid"
+        android:inputType="numberDecimal"/>
+
 </RelativeLayout>

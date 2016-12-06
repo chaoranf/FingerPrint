@@ -9,24 +9,29 @@ import android.graphics.Point;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
@@ -43,13 +48,18 @@ public class Util {
     private Util() {
     }
 
-    public static final Util got() {
+    public static final Util getInstance() {
         return SingleLoader.INSTANCE;
     }
 
+    private Map<String, String> mFinger = new HashMap<>();
+
+    public Map<String, String> getFingerMap() {
+        return mFinger;
+    }
 
     private Context mContext;
-    private List<ListContent> listItem;
+    private List<Pair<String, String>> listItem;
     private String _BRAND, _HARDWARE, _MODEL, _DISPLAY, _CPU_ABI, _CPU_INFO,
             _TOTALMEM, _AVAILMEM, _TOTALROM, _AVAILROM,
             _TOTALSDCARD = "Can't Read SDCard",
@@ -59,7 +69,6 @@ public class Util {
             _OSNAME = "Unknowed", _API, _SCREENRES, _DPI,
             _OPERATOR = "No Sim Card";
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public String fetchInfo(Context context) {
         mContext = context;
 
@@ -72,8 +81,15 @@ public class Util {
         // get display info
         display();
         // get camera info
-        backCamera();
-        frontCamera();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                backCamera();
+                frontCamera();
+            } catch (Exception ex) {
+                showTip("没有获取摄像头权限");
+                ex.printStackTrace();
+            }
+        }
         // get battery info
         battery();
         // get telephony manager info
@@ -91,11 +107,9 @@ public class Util {
                 _SCREENRES, _DPI, _BACK_CAMERA, _FRONT_CAMERA, _BATCAPACITY,
                 _BATLEVEL, _NETWORKTYPE, _IMEI, _IMSI, _OPERATOR};
         listItem = new ArrayList();
-        ListContent inside = null;
+        Pair<String, String> inside = null;
         for (int i = 0; i < listLeft.length; i++) {
-            inside = new ListContent();
-            inside.setLeft(listLeft[i]);
-            inside.setRight(listRight[i]);
+            inside = new Pair(listLeft[i], listRight[i]);
             listItem.add(inside);
             Log.e("testff", listLeft[i] + ":" + listRight[i]);
         }
@@ -103,13 +117,16 @@ public class Util {
 
         staticParamMd5 = setStaticParamMd5("");
         dynamicParamMd5 = setDynamicParamMd5("");
-
+        mFinger.put(Constant.FINGER, staticParamMd5);
+        mFinger.put(Constant.FINGER_DYNAMIC, dynamicParamMd5);
+        mFinger.put(Constant.DEVICEINFO, "all need device_info: for example brand " + _BRAND);
         return listItem.toString();
 
     }
 
     /**
      * 每个用户基本不会变的一些参数的算法md5值
+     * 这个值作为基本的finger
      */
     private String staticParamMd5;
     /**
@@ -264,7 +281,7 @@ public class Util {
     }
 
     // CPU Old Version
-    public static String getCPUInfo() {
+    public String getCPUInfo() {
         RandomAccessFile reader = null;
         String load = null;
         try {
@@ -277,7 +294,7 @@ public class Util {
         return load;
     }
 
-    public static String getCPUVersion() {
+    public String getCPUVersion() {
         RandomAccessFile reader = null;
         String load = null;
         try {
@@ -291,7 +308,7 @@ public class Util {
     }
 
     // RAM Old Version
-    public static String getTotalRAM() {
+    public String getTotalRAM() {
         RandomAccessFile reader = null;
         String load = null;
         try {
@@ -330,7 +347,7 @@ public class Util {
     }
 
     // External Storage Old Version
-    public static boolean externalMemoryAvailable() {
+    public boolean externalMemoryAvailable() {
         return android.os.Environment.getExternalStorageState().equals(
                 android.os.Environment.MEDIA_MOUNTED);
     }
@@ -553,29 +570,15 @@ public class Util {
         }
     }
 
+    private static final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    public static class ListContent implements Serializable {
-        String Left, Right;
-
-        public String getLeft() {
-            return Left;
-        }
-
-        public void setLeft(String Left) {
-            this.Left = Left;
-        }
-
-        public String getRight() {
-            return Right;
-        }
-
-        public void setRight(String Right) {
-            this.Right = Right;
-        }
-
-        @Override
-        public String toString() {
-            return Left + " : " + Right;
-        }
+    public static void showTip(final String msg) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(JmFingerApplication.appContext, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }
